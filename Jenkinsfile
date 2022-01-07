@@ -18,8 +18,8 @@ pipeline {
 
         stage('production') {
           steps {
-            mail(subject: 'from jenkins', body: 'test', to: 'yurturta@gmail.com', from: 'test@jenkins')
             echo 'prod'
+            emailext(to: 'yurturta@gmail.com', subject: 'Test', body: 'Test')
           }
         }
 

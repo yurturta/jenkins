@@ -9,7 +9,7 @@ pipeline{
             steps {
                 echo "=== Cloning repo from git ==="
                 checkout([$class: 'GitSCM', branches: [[name: '*main']], extensions: [], 
-                userRemoteConfigs: [[credentialsId: 'cae45605-f700-42a2-a303-a228da8ed9ae', url: 'ssh://tfs.ssc-assurance.is.echonet:22/tfs/CARDIF%20CZ/Digital%20Factory/_git/cop-testing-postman-collection']]
+                userRemoteConfigs: [[credentialsId: 'caexxxx-f7xx-4xxx-axxx-a228da8exxxx', url: 'ssh://tfs.domain:22/tfs/DOM%20CZ/Digital%20Factory/_git/cop-testing-postman-collection']]
                 ])
                 sh 'ls -al'
             }

@@ -1,0 +1,33 @@
+pipeline{
+    agent any
+    tools {
+        nodejs '16.17.0'
+    }
+    stages {
+        
+        stage('Clone Repo') {
+            steps {
+                echo "=== Cloning repo from git ==="
+                checkout([$class: 'GitSCM', branches: [[name: '*main']], extensions: [], 
+                userRemoteConfigs: [[credentialsId: 'cae45605-f700-42a2-a303-a228da8ed9ae', url: 'ssh://tfs.ssc-assurance.is.echonet:22/tfs/CARDIF%20CZ/Digital%20Factory/_git/cop-testing-postman-collection']]
+                ])
+                sh 'ls -al'
+            }
+        }
+        
+        stage('Run Newman') { 
+            steps {
+                sh 'npm version' 
+                sh '/usr/local/bin/newman -v'
+                sh 'cd genome/;ls -al;/usr/local/bin/newman run "Genome Automation.postman_collection_1.json" -e Genome_test1.postman_environment.json --reporters cli,htmlextra --reporter-htmlextra-export /apps/jenkins/newman/genome-report-1.html'
+                sh 'cd genome/;ls -al;/usr/local/bin/newman run "Genome Automation.postman_collection_1.json" -e Genome_test2.postman_environment.json --reporters cli,htmlextra --reporter-htmlextra-export /apps/jenkins/newman/genome-report-2.html'
+                sh 'cd genome/;ls -al;/usr/local/bin/newman run "Genome Automation.postman_collection_1.json" -e Genome_test3.postman_environment.json --reporters cli,htmlextra --reporter-htmlextra-export /apps/jenkins/newman/genome-report-3.html'
+            }
+        }
+        stage('Send email') {
+            steps {
+                emailext subject: "Test", to: "yurturta@gmail.com", from: "yurturta@gmail.com", body: """Test"""
+            }
+        }
+    }
+}

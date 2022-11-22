@@ -19,14 +19,14 @@ pipeline{
             steps {
                 sh 'npm version' 
                 sh '/usr/local/bin/newman -v'
-                sh 'cd genome/;/usr/local/bin/newman run "Genome Automation.postman_collection_1.json" -e Genome_test1.postman_environment.json --reporters cli,htmlextra --reporter-htmlextra-export /apps/jenkins/newman/genome-report-1.html'
-                sh 'cd genome/;/usr/local/bin/newman run "Genome Automation.postman_collection_1.json" -e Genome_test2.postman_environment.json --reporters cli,htmlextra --reporter-htmlextra-export /apps/jenkins/newman/genome-report-2.html'
-                sh 'cd genome/;/usr/local/bin/newman run "Genome Automation.postman_collection_1.json" -e Genome_test3.postman_environment.json --reporters cli,htmlextra --reporter-htmlextra-export /apps/jenkins/newman/genome-report-3.html'
+                sh 'cd genome/;/usr/local/bin/newman run "Genome Automation.postman_collection_1.json" -e Genome_test1.postman_environment.json --reporters cli,htmlextra --reporter-htmlextra-export /var/lib/jenkins/workspace/auto-test/auto-test-1/reports/genome-report-1.html'
+                sh 'cd genome/;/usr/local/bin/newman run "Genome Automation.postman_collection_1.json" -e Genome_test2.postman_environment.json --reporters cli,htmlextra --reporter-htmlextra-export /var/lib/jenkins/workspace/auto-test/auto-test-1/reports/genome-report-2.html'
+                sh 'cd genome/;/usr/local/bin/newman run "Genome Automation.postman_collection_1.json" -e Genome_test3.postman_environment.json --reporters cli,htmlextra --reporter-htmlextra-export /var/lib/jenkins/workspace/auto-test/auto-test-1/reports/genome-report-3.html'
             }
         }
         stage('Send email') {
             steps {
-                emailext subject: "Test", to: "yurturta@gmail.com", from: "yurturta@gmail.com", body: """Test"""
+                emailext attachLog: true, attachmentsPattern: 'reports/*html', mimeType: 'text/html', subject: "Test", to: "yurturta@gmail.com", from: "yurturta@gmail.com", body: """Test"""
             }
         }
     }

@@ -1,5 +1,6 @@
 pipeline{
     agent any
+
     tools {
         nodejs '16.17.0'
     }
@@ -8,10 +9,9 @@ pipeline{
         stage('Clone Repo') {
             steps {
                 echo "=== Cloning repo from git ==="
-                checkout([$class: 'GitSCM', branches: [[name: '*main']], extensions: [], 
-                userRemoteConfigs: [[credentialsId: 'caexxxx-f7xx-4xxx-axxx-a228da8exxxx', url: 'ssh://tfs.domain:22/tfs/DOM%20CZ/Digital%20Factory/_git/cop-testing-postman-collection']]
+                checkout([$class: 'GitSCM', branches: [[name: '$BRANCH']], extensions: [], 
+                userRemoteConfigs: [[credentialsId: 'cae45605-f700-42a2-a303-a228da8ed9ae', url: 'ssh://tfs.ssc-assurance.is.echonet:22/tfs/CARDIF%20CZ/Digital%20Factory/_git/cop-testing-postman-collection']]
                 ])
-                sh 'ls -al'
             }
         }
         
@@ -19,12 +19,17 @@ pipeline{
             steps {
                 sh 'npm version' 
                 sh '/usr/local/bin/newman -v'
-                sh 'cd genome/;/usr/local/bin/newman run "Genome Automation.postman_collection_1.json" -e Genome_test1.postman_environment.json --reporters cli,htmlextra --reporter-htmlextra-export /var/lib/jenkins/workspace/auto-test/auto-test-1/reports/genome-report-1.html'
-                sh 'cd genome/;/usr/local/bin/newman run "Genome Automation.postman_collection_1.json" -e Genome_test2.postman_environment.json --reporters cli,htmlextra --reporter-htmlextra-export /var/lib/jenkins/workspace/auto-test/auto-test-1/reports/genome-report-2.html'
-                sh 'cd genome/;/usr/local/bin/newman run "Genome Automation.postman_collection_1.json" -e Genome_test3.postman_environment.json --reporters cli,htmlextra --reporter-htmlextra-export /var/lib/jenkins/workspace/auto-test/auto-test-1/reports/genome-report-3.html'
+                script{
+                    report_file = "auto-testing/reports/genome-report-" + "$BUILD_NUMBER" + ".html"
+                }
+                
+            sh 'cd genome/;/usr/local/bin/newman run "Genome Automation.postman_collection_1.1.json" -e Genome_' + "${params.test_env}"+'.postman_environment.json --reporters cli,htmlextra --reporter-htmlextra-export /apps/jenkins/workspace/auto-test/auto-test-1/reports/genome-report-23.html'
+                archiveArtifacts artifacts: "/apps/jenkins/workspace/auto-test/auto-test-1/reports/genome-report-23.html", onlyIfSuccessful: true
             }
         }
+
         stage('Send email') {
+            when { expression { params.send_email} }
             steps {
                 emailext attachLog: true, attachmentsPattern: 'reports/*html', mimeType: 'text/html', subject: "Test", to: "yurturta@gmail.com", from: "yurturta@gmail.com", body: """Test"""
             }
